@@ -13,10 +13,6 @@ const WIFIDetails = () =>{
   useEffect(()=> {
     permission();
     getConnectedWifi();
-    room1();
-    room2();
-    room3();
-    out();
   }, []);
 
   const getConnectedWifi =()=>{
