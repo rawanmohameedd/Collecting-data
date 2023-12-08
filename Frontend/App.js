@@ -1,6 +1,7 @@
 import React , {useEffect, useState } from 'react';
 import { PermissionsAndroid, Text, View, StyleSheet} from 'react-native';
 import WifiReborn from 'react-native-wifi-reborn'
+import SingleWifiRead from './Components/SingleWifiRead';
 
 const WIFIDetails = () =>{
 
@@ -23,9 +24,8 @@ const WIFIDetails = () =>{
   }
 
   const avaliableWIFI =()=>{
-    WifiReborn.loadWifiList().then((Anas)=>{
-      console.log(Anas)
-      return 'Rawan'
+    WifiReborn.loadWifiList().then((data)=>{
+      onChangewifiList(data)
     })
   }
   const permission =  async ()=>{
@@ -46,13 +46,15 @@ const WIFIDetails = () =>{
         console.log('not granted')
       }
     } 
-
+    const anas = [1, 2, 3]
+    const rawan = anas.map((num) => {
+      return num * 2
+    })
     return(
       <View style={{flex: 1 , justifyContent:'center', alignItems:'center'}}>
-          <Text>ssid: {currentSSID} </Text>
-          <Text>Bssid: {currentBSSID}</Text>
-          <Text>Rssi: {currentRSSI}</Text>
-          <Text>Rawan</Text>
+          {wifiList.map((singleRead) => {
+              return <SingleWifiRead SSID = {singleRead.SSID} BSSID={singleRead.BSSID} level={singleRead.level} frequency={singleRead.frequency} />
+          })}
       </View>
     )
 }
