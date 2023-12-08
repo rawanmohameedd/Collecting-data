@@ -3,7 +3,6 @@ import { PermissionsAndroid, Text, View, StyleSheet} from 'react-native';
 import WifiReborn from 'react-native-wifi-reborn'
 const WIFIDetails = () =>{
 
-  const [wifiList , onChangewifiList]  = useState([]);
   const [currentSSID, onChangecurrentSSID] = useState([]);
   const [currentBSSID, onChangecurrentBSSID] = useState([]);
   const [currentRSSI, onChangecurrentRSSI] = useState([]);
