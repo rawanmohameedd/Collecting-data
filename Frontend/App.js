@@ -1,8 +1,10 @@
 import React , {useEffect, useState } from 'react';
 import { PermissionsAndroid, Text, View, StyleSheet} from 'react-native';
 import WifiReborn from 'react-native-wifi-reborn'
+
 const WIFIDetails = () =>{
 
+  const [wifiList , onChangewifiList]  = useState([]);
   const [currentSSID, onChangecurrentSSID] = useState([]);
   const [currentBSSID, onChangecurrentBSSID] = useState([]);
   const [currentRSSI, onChangecurrentRSSI] = useState([]);
@@ -11,12 +13,20 @@ const WIFIDetails = () =>{
   useEffect(()=> {
     permission();
     getConnectedWifi();
+    avaliableWIFI();
   }, []);
 
   const getConnectedWifi =()=>{
     WifiReborn.getCurrentWifiSSID().then(ssid=>onChangecurrentSSID(ssid)); 
     WifiReborn.getBSSID().then(bssid=> onChangecurrentBSSID(bssid));
     WifiReborn.getCurrentSignalStrength().then(rssi=> onChangecurrentRSSI(rssi));
+  }
+
+  const avaliableWIFI =()=>{
+    WifiReborn.loadWifiList().then((Anas)=>{
+      console.log(Anas)
+      return 'Rawan'
+    })
   }
   const permission =  async ()=>{
     const granted = await PermissionsAndroid.request(
@@ -42,6 +52,7 @@ const WIFIDetails = () =>{
           <Text>ssid: {currentSSID} </Text>
           <Text>Bssid: {currentBSSID}</Text>
           <Text>Rssi: {currentRSSI}</Text>
+          <Text>Rawan</Text>
       </View>
     )
 }
