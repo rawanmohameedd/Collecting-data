@@ -4,7 +4,6 @@ import WifiReborn, { loadWifiList } from 'react-native-wifi-reborn'
 import SingleWifiRead from './Components/SingleWifiRead';
 
 const WIFIDetails = () =>{
-
   const [wifiList , onChangewifiList]  = useState([]);
   const [currentSSID, onChangecurrentSSID] = useState([]);
   const [currentBSSID, onChangecurrentBSSID] = useState([]);
@@ -16,7 +15,8 @@ const WIFIDetails = () =>{
     getConnectedWifi();
     room1();
     room2();
-
+    room3();
+    out();
   }, []);
 
   const getConnectedWifi =()=>{
