@@ -1,6 +1,6 @@
 import React , {useEffect, useState } from 'react';
-import { PermissionsAndroid, Text, View, StyleSheet} from 'react-native';
-import WifiReborn from 'react-native-wifi-reborn'
+import { PermissionsAndroid, Text, View, StyleSheet, Pressable} from 'react-native';
+import WifiReborn, { loadWifiList } from 'react-native-wifi-reborn'
 import SingleWifiRead from './Components/SingleWifiRead';
 
 const WIFIDetails = () =>{
@@ -14,7 +14,9 @@ const WIFIDetails = () =>{
   useEffect(()=> {
     permission();
     getConnectedWifi();
-    avaliableWIFI();
+    room1();
+    room2();
+
   }, []);
 
   const getConnectedWifi =()=>{
@@ -23,11 +25,28 @@ const WIFIDetails = () =>{
     WifiReborn.getCurrentSignalStrength().then(rssi=> onChangecurrentRSSI(rssi));
   }
 
-  const avaliableWIFI =()=>{
-    WifiReborn.loadWifiList().then((data)=>{
-      onChangewifiList(data)
+  const getTopFive =(roomNum)=>{
+    WifiReborn.reScanAndLoadWifiList().then((data)=>{
+      /*sort by level*/
+      data.sort((a,b)=>{
+        return a.level < b.level ? 1 : -1
+      })
+      data = data.slice(0,3)
+
+      let dataWithRoomnum= {
+        data,
+        roomNum
+      }
+      console.log(dataWithRoomnum)
+    //request 
     })
   }
+
+  const room1 = ()=> getTopFive(1)
+  const room2 = ()=> getTopFive(2)
+  const room3 = ()=> getTopFive(3)
+  const out = ()=> getTopFive(0)
+
   const permission =  async ()=>{
     const granted = await PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
@@ -41,22 +60,37 @@ const WIFIDetails = () =>{
       },
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('granted')
+       // console.log('granted')
       } else {
         console.log('not granted')
       }
     } 
-    const anas = [1, 2, 3]
-    const rawan = anas.map((num) => {
-      return num * 2
-    })
+
     return(
-      <View style={{flex: 1 , justifyContent:'center', alignItems:'center'}}>
-          {wifiList.map((singleRead) => {
-              return <SingleWifiRead SSID = {singleRead.SSID} BSSID={singleRead.BSSID} level={singleRead.level} frequency={singleRead.frequency} />
-          })}
+      <View style={{flex: 1 , justifyContent:'center', alignItems:'center', flexDirection:'column'}}>
+      <Pressable style={{margin:20}} 
+      onPress={room1}> 
+      <Text>Room1</Text> 
+      </Pressable>
+
+      <Pressable style={{margin:20}}
+      onPress={room2}>  
+      <Text>Room2</Text> 
+      </Pressable>
+      
+      <Pressable style={{margin:20}}
+      onPress={room3}> 
+      <Text>Room3</Text> 
+      </Pressable>
+      
+      <Pressable style={{margin:20}}
+      onPress={out}> 
+      <Text>Out</Text> 
+      </Pressable>
+      
       </View>
     )
 }
 export default WIFIDetails
+
 
