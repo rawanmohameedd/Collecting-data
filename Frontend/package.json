@@ -12,6 +12,7 @@
   "dependencies": {
     "react": "18.2.0",
     "react-native": "0.71.3",
+    "react-native-sensors": "^7.3.6",
     "react-native-wifi-reborn": "^4.10.1"
   },
   "devDependencies": {
