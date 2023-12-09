@@ -54,28 +54,7 @@ const readValues = async (roomNum) => {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                BSSID1: dataWithRoomnum.data[0].BSSID,
-                BSSID2: dataWithRoomnum.data[1].BSSID,
-                BSSID3: dataWithRoomnum.data[2].BSSID,
-                BSSID4: dataWithRoomnum.data[3].BSSID,
-                BSSID5: dataWithRoomnum.data[4].BSSID,
-
-                RSSI1: dataWithRoomnum.data[0].level,
-                RSSI2: dataWithRoomnum.data[1].level,
-                RSSI3: dataWithRoomnum.data[2].level,
-                RSSI4: dataWithRoomnum.data[3].level,
-                RSSI5: dataWithRoomnum.data[4].level,
-
-                Frequency1: dataWithRoomnum.data[0].frequency ,
-                Frequency2: dataWithRoomnum.data[1].frequency ,
-                Frequency3: dataWithRoomnum.data[2].frequency ,
-                Frequency4: dataWithRoomnum.data[3].frequency ,
-                Frequency5: dataWithRoomnum.data[4].frequency ,
-
-                accelerometer: dataWithRoomnum.accelerometerSensor,
-                magnetometer: dataWithRoomnum.magnetometerSensor,
-
-                location: dataWithRoomnum.roomNum
+                data : dataWithRoomnum
             }),
         });
     } catch (error) {

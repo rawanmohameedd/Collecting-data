@@ -1,4 +1,8 @@
 function dataParserRoom3(data) {
+    if (!data || !data.data || !Array.isArray(data.data) || data.data.length < 1) {
+        console.error('Invalid or empty data received:', data);
+        return null; 
+    }
     const parsedData = {
 
         BSSID1: data.data[0]? data.data[0].BSSID : undefined,
