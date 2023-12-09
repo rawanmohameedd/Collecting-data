@@ -20,13 +20,15 @@ const DataDetails = () => {
         const accelroSensor = accelerometer.subscribe(({ x, y, z, timestamp }) => {
         console.log('accelerometerSensor:', x, y, z, timestamp);
         accelroSensor.unsubscribe();
-        setAccelerometerData({ x, y, z, timestamp });
+        const total= Math.sqrt((x*x)+(y*y)+(z*z))
+        setAccelerometerData({ total, timestamp });
         });
 
         const magnoSensor = magnetometer.subscribe(({ x, y, z, timestamp }) => {
         console.log('magnetometerSensor:', x, y, z, timestamp);
         magnoSensor.unsubscribe();
-        setMagnetometerData({ x, y, z, timestamp });
+        const total= Math.sqrt((x*x)+(y*y)+(z*z))
+        setMagnetometerData({ total, timestamp });
         });
 
         let dataWithRoomnum = {
