@@ -47,6 +47,7 @@ const DataDetails = () => {
     
 
 //fetch read request
+
 const readValues = async (roomNum) => {
     try {
         const dataWithRoomnum = await getTopFive(roomNum);
