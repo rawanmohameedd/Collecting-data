@@ -53,9 +53,7 @@ const readValues = async (roomNum) => {
         fetch("http://192.168.1.14:3000/read", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                data : dataWithRoomnum
-            }),
+            body: JSON.stringify(dataWithRoomnum),
         });
     } catch (error) {
         console.error('Error fetching data:', error);
