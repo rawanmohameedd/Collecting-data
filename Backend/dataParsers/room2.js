@@ -13,11 +13,11 @@ function dataParserRoom2(data) {
         RSSI4: data.data[3]? data.data[3].level : undefined,
         RSSI5: data.data[4]? data.data[4].level : undefined,
 
-        Frequency1: data.data[0]? data.data[0].level : undefined,
-        Frequency2: data.data[1]? data.data[1].level : undefined,
-        Frequency3: data.data[2]? data.data[2].level : undefined,
-        Frequency4: data.data[3]? data.data[3].level : undefined,
-        Frequency5: data.data[4]? data.data[4].level : undefined,
+        Frequency1: data.data[0]? data.data[0].frequency : undefined,
+        Frequency2: data.data[1]? data.data[1].frequency : undefined,
+        Frequency3: data.data[2]? data.data[2].frequency : undefined,
+        Frequency4: data.data[3]? data.data[3].frequency : undefined,
+        Frequency5: data.data[4]? data.data[4].frequency : undefined,
     
         accelerometer: data.accelerometerSensor,
         magnetometer: data.magnetometerSensor,

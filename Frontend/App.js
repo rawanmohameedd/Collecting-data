@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { PermissionsAndroid, Text, View, StyleSheet, Pressable } from 'react-native';
 import WifiReborn from 'react-native-wifi-reborn';
 import { accelerometer, magnetometer } from 'react-native-sensors';
-
 const DataDetails = () => {
     const [accelerometerData, setAccelerometerData] = useState(null);
     const [magnetometerData, setMagnetometerData] = useState(null);
@@ -10,41 +9,84 @@ const DataDetails = () => {
     permission();
     }, []);
 
-    const getTopFive = (roomNum) => {
-    WifiReborn.reScanAndLoadWifiList().then((data) => {
-        data.sort((a, b) => {
-        return a.level < b.level ? 1 : -1;
-        });
-        data = data.slice(0, 5);
-
-        const accelroSensor = accelerometer.subscribe(({ x, y, z, timestamp }) => {
-        console.log('accelerometerSensor:', x, y, z, timestamp);
-        accelroSensor.unsubscribe();
-        const total= Math.sqrt((x*x)+(y*y)+(z*z))
-        setAccelerometerData({ total, timestamp });
-        });
-
-        const magnoSensor = magnetometer.subscribe(({ x, y, z, timestamp }) => {
-        console.log('magnetometerSensor:', x, y, z, timestamp);
-        magnoSensor.unsubscribe();
-        const total= Math.sqrt((x*x)+(y*y)+(z*z))
-        setMagnetometerData({ total, timestamp });
-        });
-
-        let dataWithRoomnum = {
-        data,
-        accelerometerSensor: accelerometerData,
-        magnetometerSensor: magnetometerData,
-        roomNum,
-        };
-        console.log(dataWithRoomnum);
-    });
+    
+    const getTopFive = async (roomNum) => {
+        try {
+            const data = await WifiReborn.reScanAndLoadWifiList();
+            data.sort((a, b) => {
+                return a.level < b.level ? 1 : -1;
+            });
+            const slicedData = data.slice(0, 5);
+    
+            const accelroSensor = accelerometer.subscribe(({ x, y, z }) => {
+                accelroSensor.unsubscribe();
+                const total = Math.sqrt(x * x + y * y + z * z);
+                setAccelerometerData(total);
+            });
+    
+            const magnoSensor = magnetometer.subscribe(({ x, y, z }) => {
+                magnoSensor.unsubscribe();
+                const total = Math.sqrt(x * x + y * y + z * z);
+                setMagnetometerData(total);
+            });
+    
+            const dataWithRoomnum = {
+                data: slicedData,
+                accelerometerSensor: accelerometerData,
+                magnetometerSensor: magnetometerData,
+                roomNum,
+            };
+    
+            console.log(dataWithRoomnum);
+            return dataWithRoomnum;
+        } catch (error) {
+            console.error('Error fetching WiFi data:', error);
+            throw error;
+        }
     };
+    
 
-    const room1 = () => getTopFive(1);
-    const room2 = () => getTopFive(2);
-    const room3 = () => getTopFive(3);
-    const out = () => getTopFive(0);
+//fetch read request
+const readValues = async (roomNum) => {
+    try {
+        const dataWithRoomnum = await getTopFive(roomNum);
+        fetch("http://192.168.1.14:3000/read", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                BSSID1: dataWithRoomnum.data[0].BSSID,
+                BSSID2: dataWithRoomnum.data[1].BSSID,
+                BSSID3: dataWithRoomnum.data[2].BSSID,
+                BSSID4: dataWithRoomnum.data[3].BSSID,
+                BSSID5: dataWithRoomnum.data[4].BSSID,
+
+                RSSI1: dataWithRoomnum.data[0].level,
+                RSSI2: dataWithRoomnum.data[1].level,
+                RSSI3: dataWithRoomnum.data[2].level,
+                RSSI4: dataWithRoomnum.data[3].level,
+                RSSI5: dataWithRoomnum.data[4].level,
+
+                Frequency1: dataWithRoomnum.data[0].frequency ,
+                Frequency2: dataWithRoomnum.data[1].frequency ,
+                Frequency3: dataWithRoomnum.data[2].frequency ,
+                Frequency4: dataWithRoomnum.data[3].frequency ,
+                Frequency5: dataWithRoomnum.data[4].frequency ,
+
+                accelerometer: dataWithRoomnum.accelerometerSensor,
+                magnetometer: dataWithRoomnum.magnetometerSensor,
+
+                location: dataWithRoomnum.roomNum
+            }),
+        });
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+};
+
+    const room1 = () => readValues(1);
+    const room2 = () => readValues(2);
+    const room3 = () => readValues(3);
+    const out = () => readValues(0);
 
     const permission = async () => {
     const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
