@@ -1,0 +1,37 @@
+{
+	"info": {
+		"_postman_id": "825e4849-4ad4-4e41-878c-5bd5bdacf6a2",
+		"name": "Collecting Data",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27150047",
+		"_collection_link": "https://speeding-space-838517.postman.co/workspace/ODC~e1def501-044b-4952-a50c-4f2b184fb51a/collection/27415544-825e4849-4ad4-4e41-878c-5bd5bdacf6a2?action=share&source=collection_link&creator=27150047"
+	},
+	"item": [
+		{
+			"name": "Read",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"data\": [\r\n    {\r\n      \"BSSID\": \"d4:6b:a6:c4:28:00\",\r\n      \"SSID\": \"Mohamed Awed\",\r\n      \"capabilities\": \"[WPA-PSK-TKIP+CCMP][WPA2-PSK-TKIP+CCMP][ESS]\",\r\n      \"frequency\": 2452,\r\n      \"level\": -53,\r\n      \"timestamp\": 98191265584\r\n    },\r\n    {\r\n      \"BSSID\": \"d4:6b:a6:c4:28:01\",\r\n      \"SSID\": \"Mohamed Awed\",\r\n      \"capabilities\": \"[WPA-PSK-TKIP+CCMP][WPA2-PSK-TKIP+CCMP][ESS]\",\r\n      \"frequency\": 2350,\r\n      \"level\": -58,\r\n      \"timestamp\": 98191265584\r\n    },\r\n    {\r\n      \"BSSID\": \"d4:6b:a6:c4:28:02\",\r\n      \"SSID\": \"Mohamed Awed\",\r\n      \"capabilities\": \"[WPA-PSK-TKIP+CCMP][WPA2-PSK-TKIP+CCMP][ESS]\",\r\n      \"frequency\": 2472,\r\n      \"level\": -70,\r\n      \"timestamp\": 98191265584\r\n    },\r\n    {\r\n      \"BSSID\": \"c0:fd:84:cd:99:c3\",\r\n      \"SSID\": \"WE_CD99C3\",\r\n      \"capabilities\": \"[WPA-PSK-TKIP+CCMP][WPA2-PSK-TKIP+CCMP][ESS][WPS]\",\r\n      \"frequency\": 2432,\r\n      \"level\": -61,\r\n      \"timestamp\": 98191265573\r\n    },\r\n    {\r\n      \"BSSID\": \"d8:4a:2b:14:7d:b7\",\r\n      \"SSID\": \"MIM\",\r\n      \"capabilities\": \"[WPA2-PSK-CCMP][ESS][K][V]\",\r\n      \"frequency\": 2427,\r\n      \"level\": -65,\r\n      \"timestamp\": 98191265567\r\n    }\r\n  ],\r\n  \"roomNum\": 2\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/read",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"read"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
