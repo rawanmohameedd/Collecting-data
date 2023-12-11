@@ -2,22 +2,31 @@ import React, { useEffect, useState } from 'react';
 import { PermissionsAndroid, Text, View, StyleSheet, Pressable } from 'react-native';
 import WifiReborn from 'react-native-wifi-reborn';
 import { accelerometer, magnetometer } from 'react-native-sensors';
+import Geolocation from 'react-native-geolocation-service';
+
 const DataDetails = () => {
     const [accelerometerData, setAccelerometerData] = useState(null);
     const [magnetometerData, setMagnetometerData] = useState(null);
+    const [longitude, setLongitude] = useState(null);
+    const [latitude, setLatitude] = useState(null);
+
     useEffect(() => {
     permission();
     }, []);
 
     
     const getTopFive = async (roomNum) => {
+
         try {
+            
+            //get wifi readings
             const data = await WifiReborn.reScanAndLoadWifiList();
             data.sort((a, b) => {
                 return a.level < b.level ? 1 : -1;
             });
             const slicedData = data.slice(0, 5);
     
+            //accelrerometer and magnometer readings
             const accelroSensor = accelerometer.subscribe(({ x, y, z }) => {
                 accelroSensor.unsubscribe();
                 const total = Math.sqrt(x * x + y * y + z * z);
@@ -30,10 +39,26 @@ const DataDetails = () => {
                 setMagnetometerData(total);
             });
     
+            //Longtitude and latitude readings
+            Geolocation.getCurrentPosition(
+                position => {
+                    const latitudee = position.coords.latitude;
+                    const longitudee = position.coords.longitude;
+                    setLatitude(latitudee)
+                    setLongitude(longitudee)
+                },
+                error => {
+                    console.log('Error:', error.message);
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+                );
+
             const dataWithRoomnum = {
                 data: slicedData,
                 accelerometerSensor: accelerometerData,
                 magnetometerSensor: magnetometerData,
+                latitude,
+                longitude,
                 roomNum,
             };
     
@@ -51,7 +76,7 @@ const DataDetails = () => {
 const readValues = async (roomNum) => {
     try {
         const dataWithRoomnum = await getTopFive(roomNum);
-        fetch("http://192.168.1.14:3000/read", {
+        fetch("http://192.168.43.228:3000/read", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(dataWithRoomnum),
