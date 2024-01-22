@@ -1,95 +1,129 @@
 import React, { useEffect, useState } from 'react';
-import { PermissionsAndroid, Text, View, StyleSheet, Pressable } from 'react-native';
+import { PermissionsAndroid, Text, View, StyleSheet, Pressable, Alert } from 'react-native';
+import bssidMap from './BSSIDs';
 import WifiReborn from 'react-native-wifi-reborn';
-import { accelerometer, magnetometer } from 'react-native-sensors';
-import Geolocation from 'react-native-geolocation-service';
+import { magnetometer } from 'react-native-sensors';
 
 const DataDetails = () => {
-    const [accelerometerData, setAccelerometerData] = useState(null);
     const [magnetometerData, setMagnetometerData] = useState(null);
-    const [longitude, setLongitude] = useState(null);
-    const [latitude, setLatitude] = useState(null);
+    const [intervalId, setIntervalId] = useState(null);
+    const [stopButtonPressed, setStopButtonPressed] = useState(false);
 
     useEffect(() => {
     permission();
     }, []);
 
+    //To stop getReading function
+    const stopReading = () => {
+        clearInterval(intervalId);
+        setStopButtonPressed(true);
+        Alert.alert('Alert', 'Collecting stops!');
+    };
+
+    //get wifi & magnetometer readings
+    const fetchReading = async (roomNum) => {
+        const data = await WifiReborn.reScanAndLoadWifiList();
+
+        const filteredDataWithStrength = {};
+        Object.keys(bssidMap).forEach((bssid) => {
+            filteredDataWithStrength[bssid] = { strength: bssidMap[bssid] };
+        });
     
-    const getTopFive = async (roomNum) => {
+        //update strength values for scanned BSSIDs
+        data.forEach((wifi) => {
+            const bssid = wifi.BSSID;
+            if (filteredDataWithStrength[bssid]) {
+                filteredDataWithStrength[bssid].strength = wifi.level;
+            }
+        });
+
+        const magnoSensor = await magnetometer.subscribe(({ x, y, z }) => {
+            magnoSensor.unsubscribe();
+            const total = Math.sqrt(x * x + y * y + z * z);
+            setMagnetometerData(total);
+        });
+
+        return {
+            data: filteredDataWithStrength,
+            magnetometerSensor: magnetometerData,
+            roomNum,
+        };
+    };
+
+    const getReading = async (roomNum) => {
 
         try {
-            
-            //get wifi readings
-            const data = await WifiReborn.reScanAndLoadWifiList();
-            data.sort((a, b) => {
-                return a.level < b.level ? 1 : -1;
-            });
-            const slicedData = data.slice(0, 5);
-    
-            //accelrerometer and magnometer readings
-            const accelroSensor = accelerometer.subscribe(({ x, y, z }) => {
-                accelroSensor.unsubscribe();
-                const total = Math.sqrt(x * x + y * y + z * z);
-                setAccelerometerData(total);
-            });
-    
-            const magnoSensor = magnetometer.subscribe(({ x, y, z }) => {
-                magnoSensor.unsubscribe();
-                const total = Math.sqrt(x * x + y * y + z * z);
-                setMagnetometerData(total);
-            });
-    
-            //Longtitude and latitude readings
-            Geolocation.getCurrentPosition(
-                position => {
-                    const latitudee = position.coords.latitude;
-                    const longitudee = position.coords.longitude;
-                    setLatitude(latitudee)
-                    setLongitude(longitudee)
-                },
-                error => {
-                    console.log('Error:', error.message);
-                },
-                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-                );
+            // Display an alert to confirm the start of collecting 
+            Alert.alert(
+                'Confirmation',
+                'Are you sure you want to get the reading for this room?',
+                [
+                    {
+                        text: 'Cancel',
+                        style: 'cancel',
+                    },
+                    {
+                        text: 'Yes',
+                        onPress: async () => {
 
-            const dataWithRoomnum = {
-                data: slicedData,
-                accelerometerSensor: accelerometerData,
-                magnetometerSensor: magnetometerData,
-                latitude,
-                longitude,
-                roomNum,
-            };
-    
-            console.log(dataWithRoomnum);
-            return dataWithRoomnum;
+                        // Check if magnetometer sensor is available
+                        if (magnetometer) {
+                            const magnoSensor = await magnetometer.subscribe(({ x, y, z }) => {
+                                
+                                const total = Math.sqrt(x * x + y * y + z * z);
+                                setMagnetometerData(total);
+                                magnoSensor.unsubscribe();
+                            });
+
+                        } else {
+                            console.warn('Magnetometer sensor is not available.');
+                        }
+
+                        // User pressed "Yes," start the interval to call getReading every 2 seconds
+                        const id = setInterval(async () => {
+                            try {
+                                const dataWithRoomnum = await fetchReading(roomNum);
+                                console.log(dataWithRoomnum);
+                            } catch (error) {
+                                console.error('Error fetching WiFi data:', error);
+                            }
+                        }, 2000);
+
+                        // Save the intervalId to clear the interval later
+                        setIntervalId(id);
+                    },
+                },
+            ],
+            { cancelable: false }
+        );
         } catch (error) {
             console.error('Error fetching WiFi data:', error);
             throw error;
         }
     };
-    
-
 //fetch read request
 
-const readValues = async (roomNum) => {
-    try {
-        const dataWithRoomnum = await getTopFive(roomNum);
-        fetch("http://192.168.43.228:3000/read", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dataWithRoomnum),
-        });
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
-};
+// const readValues = async (roomNum) => {
+//     try {
+//         const dataWithRoomnum = await getTopFive(roomNum);
+//         fetch("http://192.168.43.228:3000/read", {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify(dataWithRoomnum),
+//         });
+//     } catch (error) {
+//         console.error('Error fetching data:', error);
+//     }
+// };
 
-    const room1 = () => readValues(1);
-    const room2 = () => readValues(2);
-    const room3 = () => readValues(3);
-    const out = () => readValues(0);
+    const room1in = () => getReading(1);
+    const room2in = () => getReading(2);
+    const room3in = () => getReading(3);
+
+    const room1out = () => getReading(1);
+    const room2out = () => getReading(2);
+    const room3out = () => getReading(3);
+    const out = () => getReading(0);
 
     const permission = async () => {
     const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
@@ -107,21 +141,40 @@ const readValues = async (roomNum) => {
 
     return (
     <View style={Styles.container}>
-        <Pressable style={Styles.button} onPress={room1}>
-        <Text>Room1</Text>
+    <View style={Styles.row}>
+        <Pressable style={Styles.button} onPress={room1in}>
+        <Text>Room1in</Text>
         </Pressable>
 
-        <Pressable style={Styles.button} onPress={room2}>
-        <Text>Room2</Text>
+        <Pressable style={Styles.button} onPress={room1out}>
+        <Text>Room1out</Text>
+        </Pressable>
+        </View>
+    <View style={Styles.row}>
+        <Pressable style={Styles.button} onPress={room2in}>
+        <Text>Room2in</Text>
         </Pressable>
 
-        <Pressable style={Styles.button} onPress={room3}>
-        <Text>Room3</Text>
+        <Pressable style={Styles.button} onPress={room2out}>
+        <Text>Room2out</Text>
         </Pressable>
+    </View>
+    <View style={Styles.row}>
+    <Pressable style={Styles.button} onPress={room3in}>
+    <Text>Room3in</Text>
+    </Pressable>
+
+    <Pressable style={Styles.button} onPress={room3out}>
+    <Text>Room3out</Text>
+    </Pressable>
+</View>
 
         <Pressable style={Styles.button} onPress={out}>
         <Text>Out</Text>
         </Pressable>
+        <Pressable style={Styles.button} onPress={() => stopReading()}>
+        <Text>Stop</Text>
+    </Pressable>
     </View>
     );
 };
@@ -132,12 +185,16 @@ const Styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+    },
     button: {
         borderWidth: 1,
         borderColor: 'black',
-        padding: 10,
+        padding: 20,
         borderRadius: 5,
-        margin: 20,
+        margin: 30,
     },
 });
 
