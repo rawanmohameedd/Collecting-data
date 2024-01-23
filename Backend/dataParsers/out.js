@@ -1,4 +1,4 @@
-function dataParserRoom1(data) {
+function dataParserOut(data) {
     if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
         console.error('Invalid or empty data received:', data);
         return null;
@@ -22,4 +22,4 @@ function dataParserRoom1(data) {
     return parsedData;
 }
 
-module.exports = dataParserRoom1;
+module.exports = dataParserOut;

@@ -3,7 +3,7 @@ import { PermissionsAndroid, Text, View, StyleSheet, Pressable, Alert } from 're
 import bssidMap from './BSSIDs';
 import WifiReborn from 'react-native-wifi-reborn';
 import { magnetometer } from 'react-native-sensors';
-
+import axios from 'axios'
 const DataDetails = () => {
   const [magnetometerData, setMagnetometerData] = useState(null);
   const [intervalId, setIntervalId] = useState(null);
@@ -35,14 +35,16 @@ const DataDetails = () => {
     Alert.alert('Alert', 'Collecting stops!');
   };
 
-  const fetchReading = async (roomNum) => {
+  const fetchReading = async (roomNum,indoor) => {
+console.log(0)
+   
     const data = await WifiReborn.reScanAndLoadWifiList();
-
+    console.log(1)
     const filteredDataWithStrength = {};
     Object.keys(bssidMap).forEach((bssid) => {
       filteredDataWithStrength[bssid] = { strength: bssidMap[bssid] };
     });
-
+console.log('data: '+ data)
     //update strength values for scanned BSSIDs
     data.forEach((wifi) => {
       const bssid = wifi.BSSID;
@@ -50,15 +52,17 @@ const DataDetails = () => {
         filteredDataWithStrength[bssid].strength = wifi.level;
       }
     });
+    console.log(3)
 
     return {
       data: filteredDataWithStrength,
       magnetometerSensor: magnetometerData,
       roomNum,
+      indoor
     };
   };
 
-  const getReading = async (roomNum) => {
+  const getReading = async (roomNum,indoor) => {
     try {
       // Display an alert to confirm the start of collecting
       Alert.alert(
@@ -86,7 +90,7 @@ const DataDetails = () => {
               // User pressed "Yes," start the interval to call getReading every 2 seconds
               const id = setInterval(async () => {
                 try {
-                  const dataWithRoomnum = await fetchReading(roomNum);
+                  const dataWithRoomnum = await fetchReading(roomNum,indoor);
                   console.log(dataWithRoomnum);
                 } catch (error) {
                   console.error('Error fetching WiFi data:', error);
@@ -106,14 +110,29 @@ const DataDetails = () => {
     }
   };
 
-  const room1in = () => getReading(1);
-  const room2in = () => getReading(2);
-  const room3in = () => getReading(3);
+  //fetch read request
+  // const readValues = async (roomNum, indoor) => {
+  //   try {
+  //     const dataWithRoomnum = await getReading(roomNum, indoor);
+  //     axios.post('http://192.168.1.14:3000/read', { data: dataWithRoomnum })
+  //       .then(response => {
+  //         console.log(response.data);
+  //       })
+  //       .catch(error => {
+  //         console.error('Error making POST request:', error);
+  //       });
+  //   } catch (error) {
+  //     console.error('Error fetching data:', error);
+  //   }
+  // };
+  const room1in = () => getReading(1,1);
+  const room2in = () => getReading(2,1);
+  const room3in = () => getReading(3,1);
 
-  const room1out = () => getReading(1);
-  const room2out = () => getReading(2);
-  const room3out = () => getReading(3);
-  const out = () => getReading(0);
+  const room1out = () => getReading(1,0);
+  const room2out = () => getReading(2,0);
+  const room3out = () => getReading(3,0);
+  const out = () => getReading(0,0);
 
   const permission = async () => {
     const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
