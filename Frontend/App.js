@@ -38,18 +38,18 @@ const DataDetails = () => {
   const fetchReading = async (roomNum,indoor) => {
 console.log(0)
    
-    const data = await WifiReborn.reScanAndLoadWifiList();
+    const data = await WifiReborn.loadWifiList();
     console.log(1)
     const filteredDataWithStrength = {};
     Object.keys(bssidMap).forEach((bssid) => {
-      filteredDataWithStrength[bssid] = { strength: bssidMap[bssid] };
+      filteredDataWithStrength[bssid] = bssidMap[bssid] ;
     });
 console.log('data: '+ data)
     //update strength values for scanned BSSIDs
     data.forEach((wifi) => {
       const bssid = wifi.BSSID;
       if (filteredDataWithStrength[bssid]) {
-        filteredDataWithStrength[bssid].strength = wifi.level;
+        filteredDataWithStrength[bssid]= wifi.level;
       }
     });
     console.log(3)
@@ -91,11 +91,20 @@ console.log('data: '+ data)
               const id = setInterval(async () => {
                 try {
                   const dataWithRoomnum = await fetchReading(roomNum,indoor);
+                  if(dataWithRoomnum){
+                    axios.post('http://192.168.1.14:3000/read', { data: dataWithRoomnum })
+        .then(response => {
+          console.log(response.data);
+        })
+        .catch(error => {
+          console.error('Error making POST request:', error);
+        });
+                  }
                   console.log(dataWithRoomnum);
                 } catch (error) {
                   console.error('Error fetching WiFi data:', error);
                 }
-              }, 2000);
+              }, 4000);
 
               // Save the intervalId to clear the interval later
               setIntervalId(id);

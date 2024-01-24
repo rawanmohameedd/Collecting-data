@@ -10,19 +10,22 @@ const port = 3000
 
 app.use(express.json())
 
+
 app.post('/read', (req, res) => {
-    console.log(req.body)
-    const room1Data = dataParserRoom1(req.body); 
-    const room2Data = dataParserRoom2(req.body); 
-    const room3Data = dataParserRoom3(req.body); 
-    const outData = dataParserOut(req.body); 
-    
-    append(room1Data, 1);
-    append(room2Data, 2); 
-    append(room3Data, 3); 
-    append(outData, 0);
   
+    console.log(req.body)
+    // const room1Data = dataParserRoom1(req.body); 
+    const room2Data = dataParserRoom2(req.body); 
+    // const room3Data = dataParserRoom3(req.body); 
+    // const outData = dataParserOut(req.body); 
+    
+    // append(room1Data, 1);
+    append(room2Data, 2); 
+    // append(room3Data, 3); 
+    // append(outData, 0);
     res.send('Data received and processed successfully.');
+  
+    
   });
   
 

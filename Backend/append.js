@@ -1,7 +1,6 @@
 const ObjectsToCsv = require('objects-to-csv');
 
 async function objectToRow(data,roomNumber) {4
-    console.log(data)
     if (data) {
       const csv = new ObjectsToCsv([data]);
       const roomFilePath = `./data/room${roomNumber}.csv`;
