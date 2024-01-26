@@ -5,7 +5,7 @@ import WifiReborn from 'react-native-wifi-reborn';
 import { magnetometer } from 'react-native-sensors';
 import axios from 'axios'
 const DataDetails = () => {
-  const [magnetometerData, setMagnetometerData] = useState(null);
+  // const [magnetometerData, setMagnetometerData] = useState(null);
   const [intervalId, setIntervalId] = useState(null);
   const [stopButtonPressed, setStopButtonPressed] = useState(false);
 
@@ -13,20 +13,20 @@ const DataDetails = () => {
     permission();
 
     // Subscribe to magnetometer sensor in useEffect
-    let magnoSensor = null;
-    if (magnetometer) {
-      magnoSensor = magnetometer.subscribe(({ x, y, z }) => {
-        const total = Math.sqrt(x * x + y * y + z * z);
-        setMagnetometerData(total);
-      });
-    }
+    // let magnoSensor = null;
+    // if (magnetometer) {
+    //   magnoSensor = magnetometer.subscribe(({ x, y, z }) => {
+    //     const total = Math.sqrt(x * x + y * y + z * z);
+    //     setMagnetometerData(total);
+    //   });
+    // }
 
     // Unsubscribe from magnetometer sensor on component unmount
-    return () => {
-      if (magnoSensor) {
-        magnoSensor.unsubscribe();
-      }
-    };
+    // return () => {
+    //   if (magnoSensor) {
+    //     magnoSensor.unsubscribe();
+    //   }
+    // };
   }, []);
 
   const stopReading = () => {
@@ -38,7 +38,7 @@ const DataDetails = () => {
   const fetchReading = async (roomNum,indoor) => {
 console.log(0)
    
-    const data = await WifiReborn.loadWifiList();
+    const data = await WifiReborn.reScanAndLoadWifiList();
     console.log(1)
     const filteredDataWithStrength = {};
     Object.keys(bssidMap).forEach((bssid) => {
@@ -56,7 +56,7 @@ console.log('data: '+ data)
 
     return {
       data: filteredDataWithStrength,
-      magnetometerSensor: magnetometerData,
+      // magnetometerSensor: magnetometerData,
       roomNum,
       indoor
     };
@@ -77,34 +77,34 @@ console.log('data: '+ data)
             text: 'Yes',
             onPress: async () => {
               // Check if magnetometer sensor is available
-              if (magnetometer) {
-                const magnoSensor = await magnetometer.subscribe(({ x, y, z }) => {
-                  const total = Math.sqrt(x * x + y * y + z * z);
-                  setMagnetometerData(total);
-                  magnoSensor.unsubscribe();
-                });
-              } else {
-                console.warn('Magnetometer sensor is not available.');
-              }
+              // if (magnetometer) {
+              //   const magnoSensor = await magnetometer.subscribe(({ x, y, z }) => {
+              //     const total = Math.sqrt(x * x + y * y + z * z);
+              //     setMagnetometerData(total);
+              //     magnoSensor.unsubscribe();
+              //   });
+              // } else {
+              //   console.warn('Magnetometer sensor is not available.');
+              // }
               
               // User pressed "Yes," start the interval to call getReading every 2 seconds
               const id = setInterval(async () => {
                 try {
                   const dataWithRoomnum = await fetchReading(roomNum,indoor);
-                  if(dataWithRoomnum){
-                    axios.post('http://192.168.1.14:3000/read', { data: dataWithRoomnum })
-        .then(response => {
-          console.log(response.data);
-        })
-        .catch(error => {
-          console.error('Error making POST request:', error);
-        });
-                  }
+                  
+        //             axios.post('http://192.168.1.2:3000/read', { data: dataWithRoomnum })
+        // .then(response => {
+        //   console.log(response.data);
+        // })
+        // .catch(error => {
+        //   console.error('Error making POST request:', error);
+        // });
+                  
                   console.log(dataWithRoomnum);
                 } catch (error) {
                   console.error('Error fetching WiFi data:', error);
                 }
-              }, 4000);
+              }, 30050);
 
               // Save the intervalId to clear the interval later
               setIntervalId(id);
@@ -161,36 +161,36 @@ console.log('data: '+ data)
     <View style={Styles.container}>
       <View style={Styles.row}>
         <Pressable style={Styles.button} onPress={room1in}>
-          <Text>Room1in</Text>
+          <Text style={{color:'black'}}>Room1in</Text>
         </Pressable>
         <Pressable style={Styles.button} onPress={room1out}>
-          <Text>Room1out</Text>
+          <Text style={{color:'black'}}>Room1out</Text>
         </Pressable>
       </View>
       <View style={Styles.row}>
         <Pressable style={Styles.button} onPress={room2in}>
-          <Text>Room2in</Text>
+          <Text style={{color:'black'}}>Room2in</Text>
         </Pressable>
         <Pressable style={Styles.button} onPress={room2out}>
-          <Text>Room2out</Text>
+          <Text style={{color:'black'}}>Room2out</Text>
         </Pressable>
       </View>
       <View style={Styles.row}>
         <Pressable style={Styles.button} onPress={room3in}>
-          <Text>Room3in</Text>
+          <Text style={{color:'black'}}>Room3in</Text>
         </Pressable>
         <Pressable style={Styles.button} onPress={room3out}>
-          <Text>Room3out</Text>
+          <Text style={{color:'black'}}>Room3out</Text>
         </Pressable>
       </View>
       <View style={Styles.row}>
         <Pressable style={Styles.button} onPress={out}>
-          <Text>Out</Text>
+          <Text  style={{color:'black'}}>Out</Text>
         </Pressable>
       </View>
       <View style={Styles.row}>
         <Pressable style={Styles.button} onPress={stopReading}>
-          <Text>Stop</Text>
+          <Text style={{color:'black'}}>Stop</Text>
         </Pressable>
       </View>
     </View>
@@ -210,6 +210,7 @@ const Styles = StyleSheet.create({
     marginBottom: 10,
   },
   button: {
+    color:'black',
     margin: 20,
     padding: 20,
     backgroundColor: 'lightblue',
