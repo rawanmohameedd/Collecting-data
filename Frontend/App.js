@@ -92,13 +92,17 @@ console.log('data: '+ data)
                 try {
                   const dataWithRoomnum = await fetchReading(roomNum,indoor);
                   
-        //             axios.post('http://192.168.1.2:3000/read', { data: dataWithRoomnum })
-        // .then(response => {
-        //   console.log(response.data);
-        // })
-        // .catch(error => {
-        //   console.error('Error making POST request:', error);
-        // });
+                  //fetch read request
+                  fetch("http://192.168.1.14:3000/read", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ dataWithRoomnum }),
+})
+  .catch(error => {
+    console.error('Error making POST request:', error);
+  });
+
+                  
                   
                   console.log(dataWithRoomnum);
                 } catch (error) {
@@ -119,21 +123,6 @@ console.log('data: '+ data)
     }
   };
 
-  //fetch read request
-  // const readValues = async (roomNum, indoor) => {
-  //   try {
-  //     const dataWithRoomnum = await getReading(roomNum, indoor);
-  //     axios.post('http://192.168.1.14:3000/read', { data: dataWithRoomnum })
-  //       .then(response => {
-  //         console.log(response.data);
-  //       })
-  //       .catch(error => {
-  //         console.error('Error making POST request:', error);
-  //       });
-  //   } catch (error) {
-  //     console.error('Error fetching data:', error);
-  //   }
-  // };
   const room1in = () => getReading(1,1);
   const room2in = () => getReading(2,1);
   const room3in = () => getReading(3,1);
