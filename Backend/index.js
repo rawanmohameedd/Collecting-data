@@ -12,21 +12,34 @@ app.use(express.json())
 
 
 app.post('/read', (req, res) => {
-  
-    const room1Data = dataParserRoom1(req.body); 
-    // const room2Data = dataParserRoom2(req.body); 
-    // const room3Data = dataParserRoom3(req.body); 
-    // const outData = dataParserOut(req.body); 
-    
-    append(room1Data, 1);
-    // append(room2Data, 2); 
-    // append(room3Data, 3); 
-    // append(outData, 0);
-    res.send('Data received and processed successfully.');
-  
-    
-  });
-  
+  const { dataWithRoomnum } = req.body;
+
+  if (!dataWithRoomnum) {
+    console.error('Invalid or empty data received:', dataWithRoomnum);
+    return res.status(400).send('Invalid data received.');
+  }
+
+  const { roomNum } = dataWithRoomnum;
+
+  let roomData;
+  if (roomNum === 1) {
+    roomData = dataParserRoom1(dataWithRoomnum);
+  } else if (roomNum === 2) {
+    roomData = dataParserRoom2(dataWithRoomnum);
+  } else if (roomNum === 3) {
+    roomData = dataParserRoom3(dataWithRoomnum);
+  } else if (roomNum === 0) {
+    roomData = dataParserOut(dataWithRoomnum);
+  } else {
+    console.log('Invalid roomNum:', roomNum);
+    return res.status(400).send('Invalid roomNum.');
+  }
+
+  append(roomData, roomNum);
+
+  res.json('Data received and processed successfully.');
+});
+
 
 
 app.listen(port, () => {
