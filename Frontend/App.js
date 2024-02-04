@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { PermissionsAndroid, Text, View, StyleSheet, Pressable, Alert } from 'react-native';
 import bssidMap from './BSSIDs';
 import WifiReborn from 'react-native-wifi-reborn';
-import { magnetometer } from 'react-native-sensors';
-import axios from 'axios'
+// import { magnetometer } from 'react-native-sensors';
+// import axios from 'axios'
+
 const DataDetails = () => {
   // const [magnetometerData, setMagnetometerData] = useState(null);
   const [intervalId, setIntervalId] = useState(null);
   const [stopButtonPressed, setStopButtonPressed] = useState(false);
-
+  let Readings =0
   useEffect(() => {
     permission();
 
@@ -32,19 +33,23 @@ const DataDetails = () => {
   const stopReading = () => {
     clearInterval(intervalId);
     setStopButtonPressed(true);
+    Readings=0
     Alert.alert('Alert', 'Collecting stops!');
   };
 
   const fetchReading = async (roomNum,indoor) => {
-console.log(0)
-   
+    console.log(0)
+
     const data = await WifiReborn.reScanAndLoadWifiList();
+
     console.log(1)
+
     const filteredDataWithStrength = {};
     Object.keys(bssidMap).forEach((bssid) => {
       filteredDataWithStrength[bssid] = bssidMap[bssid] ;
     });
-console.log('data: '+ data)
+    // console.log('data: '+ data)
+
     //update strength values for scanned BSSIDs
     data.forEach((wifi) => {
       const bssid = wifi.BSSID;
@@ -52,7 +57,9 @@ console.log('data: '+ data)
         filteredDataWithStrength[bssid]= wifi.level;
       }
     });
-    console.log(3)
+    Readings=Readings+1
+    console.log(Readings)
+    // console.log(3)
 
     return {
       data: filteredDataWithStrength,
@@ -93,22 +100,21 @@ console.log('data: '+ data)
                   const dataWithRoomnum = await fetchReading(roomNum,indoor);
                   
                   //fetch read request
-                  fetch("http://192.168.1.14:3000/read", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ dataWithRoomnum }),
-})
-  .catch(error => {
-    console.error('Error making POST request:', error);
-  });
+                  fetch("http://192.168.1.2:3000/read", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ dataWithRoomnum }),
+                  })
+                  .catch(error => {
+                    console.error('Error making POST request:', error);
+                  });
 
-                  
-                  
                   console.log(dataWithRoomnum);
+
                 } catch (error) {
                   console.error('Error fetching WiFi data:', error);
                 }
-              }, 30050);
+              }, 30100);
 
               // Save the intervalId to clear the interval later
               setIntervalId(id);

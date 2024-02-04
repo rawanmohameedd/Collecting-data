@@ -9,7 +9,7 @@ const bssidMap = {
     'd8:0d:17:db:be:92':-100, //anas1 ROOM3-IN
     '10:10:81:ad:c4:92':-100, //DAN1 ROOM3-OUT
     'f4:e3:fb:90:3a:a8':-100, //RAWAN1 OUT
-   
+
     // '58:ba:d4:9b:b3:3c':-100, //MOHAB 4A8LEEN BEH
 };
 

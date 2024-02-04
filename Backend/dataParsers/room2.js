@@ -1,8 +1,8 @@
 function dataParserRoom2(data) {
-    // if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
-    //     console.error('Invalid or empty data received:', data);
-    //     return null;
-    // }
+    if (!data || typeof data !== 'object' || Object.keys(data).length === 0) {
+        console.error('Invalid or empty data received:', data);
+        return null;
+    }
 
     const parsedData = {
       '24:d3:f2:a7:b3:cd': data.data['24:d3:f2:a7:b3:cd'] || null,
