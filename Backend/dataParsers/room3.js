@@ -19,4 +19,5 @@ function dataParserRoom3(data) {
   };
   return parsedData
 }
+
 module.exports = dataParserRoom3;
